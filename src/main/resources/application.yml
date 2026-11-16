@@ -1,0 +1,84 @@
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+spring:
+  application:
+    name: secretdrop-api
+  profiles:
+    active: local
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:mem:secretdrop;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: false
+
+secretdrop:
+  crypto:
+    master-key: dev-only-master-key-change-in-production-32b
+  secrets:
+    default-expiry-minutes: 60
+    min-expiry-minutes: 5
+    max-expiry-minutes: 10080
+    default-max-views: 1
+    max-max-views: 10
+    max-content-bytes: 65536
+    access-token-bytes: 24
+    delete-token-bytes: 24
+    max-passphrase-failures: 5
+  rate-limit:
+    reveal:
+      capacity: 30
+      refill-per-minute: 30
+    status:
+      capacity: 60
+      refill-per-minute: 60
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/secretdrop}
+    username: ${DATABASE_USER:secretdrop}
+    password: ${DATABASE_PASSWORD:secretdrop}
+    driver-class-name: org.postgresql.Driver
+
+secretdrop:
+  crypto:
+    master-key: ${SECRETDROP_MASTER_KEY}
+  secrets:
+    default-expiry-minutes: 60
+    min-expiry-minutes: 5
+    max-expiry-minutes: 10080
+    default-max-views: 1
+    max-max-views: 10
+    max-content-bytes: 65536
+    access-token-bytes: 24
+    delete-token-bytes: 24
+    max-passphrase-failures: 5
+  rate-limit:
+    reveal:
+      capacity: 30
+      refill-per-minute: 30
+    status:
+      capacity: 60
+      refill-per-minute: 60
